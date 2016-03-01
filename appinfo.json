@@ -8,10 +8,23 @@
     "longName": "CycloPe",
     "projectType": "native",
     "resources": {
-        "media": []
+        "media": [
+            {
+                "file": "images/menu_icon.png",
+                "menuIcon": true,
+                "name": "PEBBLE_MENU_ICON",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            }
+        ]
     },
     "sdkVersion": "3",
     "shortName": "CycloPe",
+    "targetPlatforms": [
+        "aplite",
+        "basalt",
+        "chalk"
+    ],
     "uuid": "5c9a64b5-845b-4901-bdb0-c4b99ff350c7",
     "versionLabel": "1.0",
     "watchapp": {
