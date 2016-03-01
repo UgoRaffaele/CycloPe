@@ -1,0 +1,20 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "raffopiemontese@gmail.com",
+    "enableMultiJS": true,
+    "longName": "CycloPe",
+    "projectType": "native",
+    "resources": {
+        "media": []
+    },
+    "sdkVersion": "3",
+    "shortName": "CycloPe",
+    "uuid": "5c9a64b5-845b-4901-bdb0-c4b99ff350c7",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
+}
