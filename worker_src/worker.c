@@ -1,25 +1,51 @@
 #include <pebble_worker.h>
 
 #define ACCEL_BATCH 1
+#define ACCEL_XYZ_THRESHOLD 1000
 
 DataLoggingSessionRef accel_data_log;
+
+#define SQRT_MAGIC_F 0x5f3759df 
+float sqrt_(const float x) {
+  const float xhalf = 0.5f*x;
+  union {
+    float x;
+    int i;
+  } u;
+  u.x = x;
+  u.i = SQRT_MAGIC_F - (u.i >> 1);  // gives initial guess y0
+  u.x = u.x*(1.5f - xhalf*u.x*u.x);   // This can be removed for increasing speed
+  u.x = u.x*(1.5f - xhalf*u.x*u.x);   // This can be removed for increasing speed
+  return x*u.x*(1.5f - xhalf*u.x*u.x);// Newton step, repeating increases accuracy 
+}
+
+int64_t sqrt__(int64_t val){
+	return (int64_t)sqrt_((float)val);
+}
 
 static void data_handler(AccelData *data, uint32_t num_samples) {
     
     if (num_samples >= ACCEL_BATCH) {
         
-        DataLoggingResult result = data_logging_log(accel_data_log, data, 1);
+        int64_t accel_xyz = sqrt__((data->x * data->x) + (data->y * data->y) + (data->z * data->z)) - 1000; 
+        APP_LOG(APP_LOG_LEVEL_INFO, "accel_xyz = %ld", (long)accel_xyz);
+        
+        if (accel_xyz >= ACCEL_XYZ_THRESHOLD) {
+            
+            DataLoggingResult result = data_logging_log(accel_data_log, data, 1);
     
-        if (result == DATA_LOGGING_BUSY) {
-            APP_LOG(APP_LOG_LEVEL_ERROR, "someone else is writing to this logging session");
-        } else if (result == DATA_LOGGING_FULL) {
-            APP_LOG(APP_LOG_LEVEL_ERROR, "no more space to save data");
-        } else if (result == DATA_LOGGING_NOT_FOUND) {
-            APP_LOG(APP_LOG_LEVEL_ERROR, "the logging session does not exist");
-        } else if (result == DATA_LOGGING_CLOSED) {
-            APP_LOG(APP_LOG_LEVEL_ERROR, "The logging session was made inactive");
-        } else if (result == DATA_LOGGING_INVALID_PARAMS) {
-            APP_LOG(APP_LOG_LEVEL_ERROR, "an invalid parameter was passed to one of the functions");
+            if (result == DATA_LOGGING_BUSY) {
+                APP_LOG(APP_LOG_LEVEL_ERROR, "someone else is writing to this logging session");
+            } else if (result == DATA_LOGGING_FULL) {
+                APP_LOG(APP_LOG_LEVEL_ERROR, "no more space to save data");
+            } else if (result == DATA_LOGGING_NOT_FOUND) {
+                APP_LOG(APP_LOG_LEVEL_ERROR, "the logging session does not exist");
+            } else if (result == DATA_LOGGING_CLOSED) {
+                APP_LOG(APP_LOG_LEVEL_ERROR, "The logging session was made inactive");
+            } else if (result == DATA_LOGGING_INVALID_PARAMS) {
+                APP_LOG(APP_LOG_LEVEL_ERROR, "an invalid parameter was passed to one of the functions");
+            }
+            
         }
         
     }
